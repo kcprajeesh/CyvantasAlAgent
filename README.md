@@ -1,60 +1,133 @@
-<p align="center">
-  <img src="docs/assets/logo.svg" alt="Cyvantas AI Agent" width="440"/>
+<div align="center">
+
+<img src="docs/assets/logo.svg" alt="Cyvantas AI Agent" width="440"/>
+
+# CYVANTAS AI AGENT
+
+### Security control plane for evidence-driven AI application security
+
+**50 agents · 26 commands · 19 CLI tools · 11 skills · 2 MCP servers · 7 AI coding tools · 16 bug-bounty platforms · 2,500+ payload lines**
+
+<p>
+  <img src="https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white" alt="Python 3.10+"/>
+  <img src="https://img.shields.io/badge/Claude_Code-supported-d97757" alt="Claude Code"/>
+  <img src="https://img.shields.io/badge/AI_IDEs-7-1f6feb" alt="7 AI coding tools"/>
+  <img src="https://img.shields.io/badge/Agents-50-8957e5" alt="50 agents"/>
+  <img src="https://img.shields.io/badge/Commands-26-2ea043" alt="26 commands"/>
+  <img src="https://img.shields.io/badge/CLI_Tools-19-f85149" alt="19 CLI tools"/>
+  <img src="https://img.shields.io/badge/MCP-2_servers-2ea043" alt="2 MCP servers"/>
 </p>
 
-<h1 align="center">Cyvantas AI Agent</h1>
-
-<p align="center">
-  <em>Evidence-driven, authorization-aware application security testing platform for Claude Code and 6 other AI coding tools — 50 agents, 26 commands, 19 CLI tools, 11 skills, 2 MCP servers.</em>
-</p>
-
-<p align="center">
-  <img src="https://img.shields.io/badge/python-3.10%2B-blue?logo=python&logoColor=white" alt="Python 3.10+"/>
-  <img src="https://img.shields.io/badge/Claude-Code-d97757" alt="Claude Code"/>
-  <img src="https://img.shields.io/badge/MCP-servers%20%C3%97%202-2ea043" alt="MCP servers"/>
-  <img src="https://img.shields.io/badge/agents-50-8957e5" alt="50 agents"/>
-  <img src="https://img.shields.io/badge/payloads-2500%20lines-f85149" alt="Payloads"/>
-  <img src="https://img.shields.io/badge/IDEs-7-1f6feb" alt="7 IDE targets"/>
-</p>
+</div>
 
 ---
 
-**~760 files · ~118k lines · 50 agents · 26 commands · 19 CLI tools · 11 skills · 2 MCP servers (16 bug-bounty platforms + BYO writeup search) · 2,500 payload lines**
+## ⚡ The idea
 
-Cyvantas is an evidence-driven application security testing platform. It preserves the original Pentest Agent Suite capabilities while adding a centralized security control plane. Battle-tested hunting methodology with concrete payloads, 7-Question Gate validation, autonomous hunt loops, A→B exploit chain building, persistent brain with endpoint tracking, optional semantic writeup search (bring your own index), automatic cost tracking via CC hooks, live platform integration, and a cross-IDE installer that emits the native format for Claude Code, Codex, Gemini, Cursor, Windsurf, VS Code Copilot, and OpenClaw.
+Cyvantas is an **evidence-driven application security testing platform** built around AI coding tools.
 
+It keeps the original Pentest Agent Suite capabilities while adding a centralized security control plane for:
 
-## Cyvantas security control plane
+- authorization and target scope
+- least-privilege execution
+- workspace path protection
+- secret redaction
+- network restrictions
+- approval binding
+- evidence hashing
+- task dependencies
+- agent metadata
+- budget-aware orchestration
 
-Cyvantas adds a fail-closed control plane around the existing agents and provider renderers: authorization context, centralized scope matching, workspace path guards, secret redaction, network restrictions, approval binding, evidence hashing, task dependencies, agent metadata, and budget-aware orchestration. The existing Pentest Agent Suite command and provider paths remain available for compatibility.
+The execution model is deliberately fail-closed:
 
-The intended execution model is **AI reasoning → orchestrator → policy/scope → least-privilege tool → controlled execution → evidence → validation → report → human approval**. Target content and retrieved documents are treated as untrusted data and never as higher-priority instructions.
+```text
+AI reasoning
+     ↓
+orchestrator
+     ↓
+policy / scope
+     ↓
+least-privilege tool
+     ↓
+controlled execution
+     ↓
+evidence
+     ↓
+validation
+     ↓
+report
+     ↓
+human approval
+```
 
-## Quick Start
+> Target content and retrieved documents are treated as **untrusted data** and never as higher-priority instructions.
+
+---
+
+## 🧭 Navigation
+
+- [Quick Start](#-quick-start)
+- [Installation & AI Tool Support](#-installation--ai-tool-support)
+- [Provider Bundles](#-provider-bundles)
+- [Workflow](#-workflow)
+- [MCP Servers](#-mcp-servers)
+- [Writeup Search & RAG Builder](#-writeup-search--rag-builder)
+- [Cost Tracking Hooks](#-cost-tracking-hooks)
+- [Commands](#-commands)
+- [Agent Fleet](#-agent-fleet)
+- [Hunting Skills](#-hunting-skills)
+- [CLI Tools](#-cli-tools)
+- [Rules Library](#-rules-library)
+- [Key Security Features](#-security--orchestration-highlights)
+- [Requirements](#-requirements)
+- [License](#-license)
+
+---
+
+## 🚀 Quick Start
+
+MCP servers are launched with `uv run --with mcp`; no global pip install is required.
 
 ```bash
-# MCP servers are launched via `uv run --with mcp` — no global pip install required.
 export HACKERONE_USERNAME=you HACKERONE_TOKEN=your_token
+
 uv run python3 tools/scaffold.py hackerone tesla
 cd ~/bounties/hackerone-tesla && claude
+
 /model opus             # Opus 4.7 [1M] — subagents inherit via model: "inherit"
 /sync hackerone tesla
 /brain init && /status
 /hunt tesla.com
 ```
 
-`scaffold.py` provisions the workspace for every supported project-scoped
-client, not only Claude Code: `CLAUDE.md`, `AGENTS.md`, `.codex/`,
-`.agents/skills/`, `.gemini/`, `.cursor/`, `.windsurf/`, `.github/`, and
-`.vscode/mcp.json` are generated from the copied workspace assets so paths
-resolve inside the bounty workspace.
+### What `scaffold.py` provisions
 
-## Install (Claude Code + 6 other AI coding tools)
+`scaffold.py` provisions a project-scoped workspace for every supported client, not only Claude Code:
 
-The framework ships pre-rendered for every supported tool. There are two ways
-to use it:
+```text
+CLAUDE.md
+AGENTS.md
+.codex/
+.agents/skills/
+.gemini/
+.cursor/
+.windsurf/
+.github/
+.vscode/mcp.json
+```
 
-**1. Use the bundles directly (no install step)**
+The assets are copied into the bounty workspace so path references resolve there.
+
+---
+
+## 🧩 Installation & AI Tool Support
+
+Cyvantas ships pre-rendered for every supported AI coding tool.
+
+### Option A — use the bundles directly
+
+No installation step is required:
 
 ```bash
 git clone https://github.com/H-mmer/pentest-agents-suite
@@ -62,39 +135,38 @@ cd pentest-agents-suite/pentest-agents/providers/codex
 codex                       # or: cd ../gemini && gemini, etc.
 ```
 
-The `providers/<id>/` tree contains a fully-translated, ready-to-use bundle
-for each non-Claude target. Path references inside use `..` to reach the
-repo's `tools/`, `rules/`, and `mcp-*-server/` — so the bundle works as
-long as it stays inside the cloned repo.
+The `providers/<id>/` directory contains a fully translated, ready-to-use bundle for each non-Claude target. Its path references use `..` to reach the repository's `tools/`, `rules/`, and `mcp-*-server/` directories, so the bundle works while it remains inside the cloned repository.
 
-**2. Run the installer (writes into your own project or `~/.codex/` etc.)**
+### Option B — install into a project or globally
 
 ```bash
 python3 -m tools.installer install --targets all --scope project
 python3 -m tools.installer install --targets codex --scope global
 ```
 
-Install mode rewrites paths to absolute references back into the cloned
-pentest-agents repo, so the install works no matter where the user's own
-project lives.
+Install mode rewrites paths to absolute references into the cloned pentest-agents repository, so the installation works regardless of where the user's project lives.
 
-| Target | Agents | Slash commands | Rules | MCP | Scopes |
+### Compatibility matrix
+
+| Target | Agents | Commands | Rules / Instructions | MCP | Scope |
 |---|---|---|---|---|---|
 | **Claude Code** | native `.claude/agents/*.md` | `.claude/skills/<name>/SKILL.md` | `CLAUDE.md` | `.mcp.json` / `~/.claude.json` | global + project |
-| **OpenAI Codex** | native `.codex/agents/*.toml` | `.agents/skills/<name>/SKILL.md` | `AGENTS.md` (≤32 KiB) | `[mcp_servers.*]` in `config.toml` | global + project |
-| **Google Gemini** | native `.gemini/agents/*.md` | TOML in `.gemini/commands/` | `GEMINI.md` | `mcpServers` in `settings.json` | global + project |
-| **Cursor** | → skills `.cursor/skills/agent-*/SKILL.md` (no native subagents) | → skills `.cursor/skills/cmd-*/SKILL.md` | `.cursor/rules/*.mdc` + `AGENTS.md` | `.cursor/mcp.json` | global + project |
+| **OpenAI Codex** | `.codex/agents/*.toml` | `.agents/skills/<name>/SKILL.md` | `AGENTS.md` (≤32 KiB) | `[mcp_servers.*]` in `config.toml` | global + project |
+| **Google Gemini** | `.gemini/agents/*.md` | TOML in `.gemini/commands/` | `GEMINI.md` | `mcpServers` in `settings.json` | global + project |
+| **Cursor** | → skills `.cursor/skills/agent-*/SKILL.md` | → skills `.cursor/skills/cmd-*/SKILL.md` | `.cursor/rules/*.mdc` + `AGENTS.md` | `.cursor/mcp.json` | global + project |
 | **Windsurf** | → skills | Workflows | `.windsurf/rules/*.md` (≤12 KiB / file) | `~/.codeium/windsurf/mcp_config.json` | global + project |
-| **VS Code Copilot** | `.github/agents/*.agent.md` (≤30 KiB / agent) | `.github/prompts/*.prompt.md` | `.github/copilot-instructions.md` + `.github/instructions/*` | `.vscode/mcp.json` | project + global-MCP |
+| **VS Code Copilot** | `.github/agents/*.agent.md` (≤30 KiB) | `.github/prompts/*.prompt.md` | `.github/copilot-instructions.md` + `.github/instructions/*` | `.vscode/mcp.json` | project + global-MCP |
 | **OpenClaw** | → skills | → skills | `~/.openclaw/workspace/AGENTS.md` or `<proj>/AGENTS.md` | `mcp.servers` in `~/.openclaw/openclaw.json` | global + project *(MCP is user-level)* |
 
-Cursor, Windsurf, and OpenClaw have no native subagent concept; Claude-format
-agents render as skills/rules. Codex commands are emitted as AgentSkills under
-`.agents/skills/`; the deprecated `.codex/prompts/` path is not used.
+Cursor, Windsurf, and OpenClaw have no native subagent concept; Claude-format agents render as skills/rules.
 
-**`providers/` directory** (in the cloned repo):
+Codex commands are emitted as AgentSkills under `.agents/skills/`; the deprecated `.codex/prompts/` path is not used.
 
-```
+---
+
+## 🛠️ Provider Bundles
+
+```text
 providers/
 ├── codex/    AGENTS.md + .codex/{agents,config.toml} + .agents/skills
 ├── gemini/   GEMINI.md + .gemini/{agents,commands} + settings.json
@@ -104,273 +176,593 @@ providers/
 └── openclaw/ AGENTS.md + .agents/skills/ + openclaw.json
 ```
 
-`providers/` is **generated**, not edited by hand. Re-render after editing
-`.claude/`, `rules/`, or `skills/` source:
+`providers/` is **generated**, not edited by hand.
+
+After changing `.claude/`, `rules/`, or `skills/`, regenerate:
 
 ```bash
 python3 -m tools.installer render --targets all
 python3 -m tools.installer render --check        # exits 1 if drift
 ```
 
-The `test_committed_providers_match_render` pytest case enforces drift
-detection locally — there is no GitHub Actions CI by project policy.
+The `test_committed_providers_match_render` pytest case enforces drift detection locally. There is **no GitHub Actions CI by project policy**.
 
-### What gets translated
+### Translation rules
 
 When `.claude/` content is rendered for non-Claude targets, the translator:
 
-- **Drops the `model:` field** — each target uses its own default model.
-- **Strips Claude-specific prose** — "Claude Code" → "the AI coding tool",
-  "the Agent tool" → "the subagent dispatch tool", `model: "inherit"` is
-  removed entirely.
-- **Rewrites `$CLAUDE_PROJECT_DIR`** — to `..` in `providers/` (relative
-  to the cloned repo), or to absolute paths into the cloned source repo
-  when installing into a user's project.
-- **Maps `effort:` frontmatter** to `model_reasoning_effort` in Codex TOML.
-- **Caps body length** — Copilot agents are truncated at 30,000 chars
-  (Copilot's hard limit). Windsurf rules are chunked at 12,000 chars
-  (workspace) / 6,000 chars (global).
-- **Adds Copilot subagent links** — orchestrator agents (chain-builder,
-  correlator, recon-ranker) get an `agents:` list of siblings so Copilot
-  wires the dispatch graph.
+- drops the `model:` field because each target uses its own default model
+- strips Claude-specific prose: `"Claude Code"` → `"the AI coding tool"`
+- replaces `"the Agent tool"` → `"the subagent dispatch tool"`
+- removes `model: "inherit"`
+- rewrites `$CLAUDE_PROJECT_DIR` to `..` in `providers/`, or to absolute paths when installing
+- maps `effort:` frontmatter to `model_reasoning_effort` in Codex TOML
+- caps Copilot agent bodies at 30,000 characters
+- chunks Windsurf rules at 12,000 characters (workspace) / 6,000 characters (global)
+- adds Copilot subagent links to orchestrators such as chain-builder, correlator, and recon-ranker
 
 ### Installer management
 
 ```bash
-pentest-agents list                      # detect which targets are installed
+pentest-agents list
 pentest-agents install --targets claude_code,codex --scope global
-pentest-agents install --dry-run         # preview every file + JSON merge
-pentest-agents verify                    # check manifest vs. disk (drift)
-pentest-agents uninstall                 # reverse, restore .pa-backup files
-pentest-agents render --targets all      # regenerate providers/<id>/
-pentest-agents render --check            # drift gate (exit 1 if dirty)
+pentest-agents install --dry-run
+pentest-agents verify
+pentest-agents uninstall
+pentest-agents render --targets all
+pentest-agents render --check
 ```
 
-Every install records a manifest (`.pentest-agents/manifest.json` for project
-scope, `~/.config/pentest-agents/manifest.json` for global). Uninstall only
-removes files we wrote and surgically strips only the MCP/JSON keys we merged —
-your other settings are never touched. Conflicting writes back up the original
-as `<path>.pa-backup` and are restored on uninstall.
+Every installation records a manifest:
 
-
-
-## Workflow
-
-```
-New program:   /new → /sync → /brain init → /analyze → /surface → /hunt
-Returning:     /resume <target> → /hunt or /autopilot
-After finding: /validate → /chain → /report → /dupcheck → /submit → /learn
-Batch triage:  /triage (7-Question Gate on all findings)
+```text
+project scope → .pentest-agents/manifest.json
+global scope  → ~/.config/pentest-agents/manifest.json
 ```
 
-## MCP Servers (2)
+Uninstall removes only files Cyvantas wrote and surgically strips only the MCP/JSON keys it merged. Other settings are untouched.
 
-### bounty-platforms (16 platforms)
-HackerOne (full API), Bugcrowd, Intigriti, Immunefi (public), YesWeHack + 11 stubs.
-7 MCP tools: list_platforms, get_program_scope, get_program_policy, search_hacktivity, sync_program, draft_report, submit_report.
+Conflicting files are backed up as:
 
-### writeup-search (BYO index)
-Searchable knowledge base agents query during hunting and validation.
-4 MCP tools:
-- `search_writeups` — semantic search (FAISS) or keyword search for prior art
-- `get_writeup` — full writeup content by ID
-- `search_techniques` — exploitation techniques by vuln class
-- `search_payloads` — curated payloads from `rules/payloads.md`
+```text
+<path>.pa-backup
+```
 
-> **The writeup index is not bundled.** Bulk-redistributing scraped hacktivity violates most platform ToS, so this repo ships the server only. The `search_payloads` + `search_techniques` fallback works out of the box; the semantic/keyword layers activate once you point the server at your own index.
+and restored during uninstall.
 
-**Three search modes** (auto-detected, graceful fallback):
+---
+
+## 🔄 Workflow
+
+### New target
+
+```text
+/new
+  ↓
+/sync
+  ↓
+/brain init
+  ↓
+/analyze
+  ↓
+/surface
+  ↓
+/hunt
+```
+
+### Returning target
+
+```text
+/resume <target>
+       ↓
+ /hunt  or  /autopilot
+```
+
+### Finding lifecycle
+
+```text
+/validate
+    ↓
+ /chain
+    ↓
+ /report
+    ↓
+/dupcheck
+    ↓
+ /submit
+    ↓
+ /learn
+```
+
+### Batch triage
+
+```text
+/triage
+   ↓
+7-Question Gate
+   ↓
+PASS / KILL / DOWNGRADE / CHAIN REQUIRED
+```
+
+---
+
+## 🔌 MCP Servers
+
+Cyvantas ships with **2 MCP servers**.
+
+### 1. `bounty-platforms`
+
+**16 platforms**
+
+- HackerOne — full API
+- Bugcrowd
+- Intigriti
+- Immunefi — public
+- YesWeHack
+- 11 additional stubs
+
+**7 MCP tools**
+
+```text
+list_platforms
+get_program_scope
+get_program_policy
+search_hacktivity
+sync_program
+draft_report
+submit_report
+```
+
+### 2. `writeup-search`
+
+A searchable knowledge base that agents can query during hunting and validation.
+
+**4 MCP tools**
+
+| Tool | Role |
+|---|---|
+| `search_writeups` | Semantic FAISS search or keyword search for prior art |
+| `get_writeup` | Retrieve complete writeup content by ID |
+| `search_techniques` | Search exploitation techniques by vulnerability class |
+| `search_payloads` | Search curated payloads from `rules/payloads.md` |
+
+> **The writeup index is not bundled.** Bulk redistribution of scraped hacktivity can violate platform ToS. The repository ships the server instead. `search_payloads` and `search_techniques` work immediately; semantic/keyword layers activate after you provide your own index.
+
+---
+
+## 🧠 Writeup Search Modes
+
+The server automatically detects the strongest available mode and falls back gracefully.
 
 | Mode | Requires | Searches |
-|------|----------|----------|
-| **FAISS** (semantic) | `faiss-cpu`, `sentence-transformers`, your `metadata.db` + `index.faiss` | Your writeup corpus via vector embeddings |
-| **SQLite** (keyword) | Your `metadata.db` only | Your writeup corpus via `LIKE` over the text column |
-| **Local** (default) | Nothing — zero deps | `rules/payloads.md` + `skills/` shipped in this repo |
+|---|---|---|
+| **FAISS** | `faiss-cpu`, `sentence-transformers`, your `metadata.db` + `index.faiss` | Your writeup corpus using vector embeddings |
+| **SQLite** | Your `metadata.db` | Your writeup corpus using `LIKE` over the text column |
+| **Local** | Nothing | `rules/payloads.md` + shipped `skills/` |
 
-Point the server at your index by dropping `metadata.db` (+ optionally `index.faiss`) into `~/.local/share/pentest-writeups/`, or set `WRITEUP_DB_DIR=/path/to/dir`.
+Point the server at your index by placing:
 
-**Expected schema** (`metadata.db`): a SQLite file with at least one table containing columns `id`, `title`, `url`, and one text column (`content` / `text` / `body` / `writeup`). Row order in the table must match vector order in `index.faiss` when using semantic mode.
+```text
+metadata.db
+index.faiss   # optional outside local/SQLite mode
+```
 
-### Build your own index — `rag-builder/`
+in:
 
-The repo now ships a local RAG/FAISS builder under [`rag-builder/`](rag-builder/) that turns a list of GitHub / GitLab repositories into a `metadata.db` + `index.faiss` pair the writeup-search MCP server consumes. Destructive operations (clone, embed, write) are **always gated behind `--execute`** — running the CLI without it prints the plan and changes nothing, so you can never wipe an existing index by accident.
+```text
+~/.local/share/pentest-writeups/
+```
+
+or set:
+
+```bash
+export WRITEUP_DB_DIR=/path/to/dir
+```
+
+### Expected `metadata.db` schema
+
+The SQLite database needs at least one table containing:
+
+```text
+id
+title
+url
+content / text / body / writeup
+```
+
+When semantic mode is used, row order in the table must match vector order in `index.faiss`.
+
+---
+
+## 🏗️ Build Your Own Writeup Index
+
+The repository includes a local RAG/FAISS builder in:
+
+```text
+rag-builder/
+```
+
+It converts a list of GitHub / GitLab repositories into:
+
+```text
+metadata.db
+index.faiss
+```
+
+Destructive operations such as clone, embed, and write are **always gated behind `--execute`**.
+
+Without `--execute`, the CLI only prints the plan and changes nothing.
+
+### Build sequence
 
 ```bash
 cd rag-builder
 
 # 1. Inspect the plan — no network, no writes.
 python3 build.py status
-python3 build.py ingest                    # dry-run (the default)
+python3 build.py ingest
 
-# 2. Opt-in pre-flight: probe every URL with `git ls-remote` (network).
-python3 build.py ingest --check-remotes    # ~5s for 141 repos at 16 workers
+# 2. Optional pre-flight: probe every URL with git ls-remote.
+python3 build.py ingest --check-remotes
 
 # 3. Actually clone + index every repo from repos.yaml into ./data/.
 python3 build.py ingest --execute
-python3 build.py ingest --execute --check-remotes   # skip unreachable first
+python3 build.py ingest --execute --check-remotes
 
 # 4. Point the MCP server at the output.
 export WRITEUP_DB_DIR="$PWD/data"
 python3 ../mcp-writeup-server/server.py --test
 ```
 
-`rag-builder/repos.yaml` ships with a 146-entry seed covering CTF archives, bug-bounty reports, payload collections, and research aggregators — edit freely. `repos-skipped.yaml` is loaded automatically as an exclusion list (override with `--skip-list` or `--no-skip-list`). `config.yaml` controls the embedding model (`all-MiniLM-L6-v2` by default), host allowlist, clone size cap, and file-size ceiling. See [`rag-builder/README.md`](rag-builder/README.md) for the full reference.
+`rag-builder/repos.yaml` ships with a **146-entry seed** covering CTF archives, bug-bounty reports, payload collections, and research aggregators.
 
-## CC Hooks (automatic cost tracking)
+- edit the seed freely
+- `repos-skipped.yaml` is loaded automatically as an exclusion list
+- override with `--skip-list` or `--no-skip-list`
+- `config.yaml` controls the embedding model, host allowlist, clone size cap, and file-size ceiling
+- default embedding model: `all-MiniLM-L6-v2`
 
-Configured in settings.json, fires automatically:
-- **SubagentStop** → `cost_hook.py` logs agent name + session to `cost-tracking.json`
-- **Stop** → logs session end
-- **SessionStart** → welcome message
+See `rag-builder/README.md` for the full reference.
 
-Statusline shows live cost from session token data: `$0.57`
+---
 
-## Commands (26)
+## 💰 Cost Tracking Hooks
+
+Configured in `settings.json` and fired automatically:
+
+| Hook | Action |
+|---|---|
+| `SubagentStop` | `cost_hook.py` logs agent name + session to `cost-tracking.json` |
+| `Stop` | Logs session end |
+| `SessionStart` | Shows welcome message |
+
+The statusline exposes live session cost from token data, for example:
+
+```text
+$0.57
+```
+
+---
+
+## 🎛️ Commands
+
+Cyvantas exposes **26 commands** grouped by job.
 
 ### Hunting & Analysis
-| Command | Description |
-|---------|-------------|
-| `/hunt <target> [--vuln-class]` | Active hunting — searches writeup DB for techniques first, then tests with concrete payloads |
-| `/autopilot <target>` | Autonomous loop with --paranoid/--normal/--yolo checkpoints |
-| `/surface <target>` | P1/P2/Kill ranked attack surface |
-| `/chain` | Build A→B→C exploit chains via chain-builder agent (9 capability rows + 4 documented deep chains in `rules/chain-table.md`) |
-| `/analyze <target>` | AI analysis: crown jewels, attack paths, blind spots |
-| `/mindmap <target>` | Attack surface tree with brain status |
-| `/sast <repo>` | Source-code vulnerability hunting (entry → flow → gap → exploit pipeline) |
+
+| Command | What it does |
+|---|---|
+| `/hunt <target> [--vuln-class]` | Active hunting — searches writeup DB for techniques first, then tests concrete payloads |
+| `/autopilot <target>` | Autonomous loop with `--paranoid` / `--normal` / `--yolo` checkpoints |
+| `/surface <target>` | P1 / P2 / Kill attack-surface ranking |
+| `/chain` | Builds A→B→C exploit chains using the chain-builder agent; capability table has 9 rows + 4 documented deep chains |
+| `/analyze <target>` | AI analysis of crown jewels, attack paths, and blind spots |
+| `/mindmap <target>` | Attack-surface tree with brain status |
+| `/sast <repo>` | Source-code vulnerability hunting: entry → flow → gap → exploit |
 
 ### Validation & Reporting
-| Command | Description |
-|---------|-------------|
-| `/validate <finding>` | 7-Question Gate → PASS/KILL/DOWNGRADE/CHAIN REQUIRED |
-| `/triage` | Batch-validate ALL findings, kill weak ones |
-| `/quality <draft>` | Score report 1-10 (blocks below 7) |
-| `/report [format]` | Reports (hard gate: requires /validate PASS) |
-| `/dupcheck <desc>` | Hacktivity + writeup DB for duplicates |
-| `/submit <finding>` | Submit (hard gate: /validate PASS + /quality ≥ 7) |
+
+| Command | What it does |
+|---|---|
+| `/validate <finding>` | 7-Question Gate → PASS / KILL / DOWNGRADE / CHAIN REQUIRED |
+| `/triage` | Batch-validates all findings and kills weak ones |
+| `/quality <draft>` | Scores a report 1–10 and blocks scores below 7 |
+| `/report [format]` | Generates reports; hard gate requires `/validate PASS` |
+| `/dupcheck <desc>` | Checks Hacktivity + writeup DB for duplicates |
+| `/submit <finding>` | Submission requires `/validate PASS` + `/quality ≥ 7` |
 
 ### Session & Memory
-| Command | Description |
-|---------|-------------|
-| `/resume <target>` | Resume — untested endpoints + suggestions |
-| `/remember` | Log finding/pattern for cross-target learning |
-| `/learn <id> <status>` | Record response — auto-boosts paid techniques |
-| `/brain` | init, brief, status, endpoint, endpoints, record, exhausted |
+
+| Command | What it does |
+|---|---|
+| `/resume <target>` | Resumes with untested endpoints + suggestions |
+| `/remember` | Logs a finding/pattern for cross-target learning |
+| `/learn <id> <status>` | Records response and auto-boosts paid techniques |
+| `/brain` | `init`, `brief`, `status`, `endpoint`, `endpoints`, `record`, `exhausted` |
 
 ### Infrastructure
-| Command | Description |
-|---------|-------------|
+
+| Command | What it does |
+|---|---|
 | `/new`, `/sync`, `/status` | Setup + dashboard |
 | `/pipeline`, `/quickscan`, `/fullscan` | Scanning pipelines |
 | `/correlate` | Chain discovery across findings |
-| `/cost`, `/monitor` | Cost tracking, target change detection |
+| `/cost`, `/monitor` | Cost tracking + target change detection |
 
-## Agents (50)
+---
 
-### H1 Weakness Specialists (19)
-xss-hunter (#60/#61/#62), sqli-hunter (#67), csrf-hunter (#57), ssrf-hunter (#75), ssti-hunter (#74), idor-hunter (#55), auth-tester (#27), info-disclosure (#18), open-redirect (#38), rce-hunter (#70), xxe-hunter (#63), file-upload (#39), cors-hunter (#58), subdomain-takeover (#145), business-logic (#28), race-condition (#29), privilege-escalation (#26), oauth-hunter (#1/#22/#106/#137), llm-ai-hunter (chains under #18/#55/#61/#70/#106)
+## 🤖 Agent Fleet
 
-### Hunting & Analysis (3)
-- **validator** — 7-Question Gate + never-submit list (PASS/KILL/DOWNGRADE/CHAIN)
-- **chain-builder** — A→B chain walk against the capability table, searches writeup DB for proven chains
-- **recon-ranker** — P1/P2/Kill surface ranking
+**50 agents** organized around hunting, validation, orchestration, recon, SAST, and specialized security work.
 
-### Infrastructure / Recon (10)
-recon, vuln-scanner, config-auditor, cloud-recon, js-analyzer, waf-profiler, graphql-audit, nuclei-writer, browser-agent (Burp MCP), browser-stealth-agent (Camoufox)
+### H1 Weakness Specialists — 19
 
-### Meta / Validation (9)
-brain, correlator, quality-check, monitor, poc-builder, report-writer, scope-check, browser-verifier (client-side PoC proof), dast-devils-advocate (adversarial downgrade)
+```text
+xss-hunter (#60/#61/#62)
+sqli-hunter (#67)
+csrf-hunter (#57)
+ssrf-hunter (#75)
+ssti-hunter (#74)
+idor-hunter (#55)
+auth-tester (#27)
+info-disclosure (#18)
+open-redirect (#38)
+rce-hunter (#70)
+xxe-hunter (#63)
+file-upload (#39)
+cors-hunter (#58)
+subdomain-takeover (#145)
+business-logic (#28)
+race-condition (#29)
+privilege-escalation (#26)
+oauth-hunter (#1/#22/#106/#137)
+llm-ai-hunter (chains under #18/#55/#61/#70/#106)
+```
 
-### SAST Pipeline (8)
-sast-file-ranker, sast-entry-mapper, sast-danger-mapper, sast-flow-tracer, sast-gap-analyzer, sast-devils-advocate, sast-hunter, sast-exploit-builder
+### Hunting & Analysis — 3
 
-### Specialized (1)
-web3-auditor — Solidity grep arsenal, Foundry PoC, DeFi patterns
+- **validator** — 7-Question Gate + never-submit list
+- **chain-builder** — A→B chain walk against the capability table; searches the writeup DB for proven chains
+- **recon-ranker** — P1 / P2 / Kill surface ranking
 
-## Hunting Skills (5 deep methodology skills + 6 reference skills = 11)
+### Infrastructure / Recon — 10
 
-The hunt-* skills are vuln-class-specific methodology files distilled from
-public bug-bounty reports. Each has a verified 2024-2026 CVE catalog and
-sub-techniques. The matching specialist agent reads its skill via
-`Read $CLAUDE_PROJECT_DIR/skills/hunt-<class>/SKILL.md` before testing.
+```text
+recon
+vuln-scanner
+config-auditor
+cloud-recon
+js-analyzer
+waf-profiler
+graphql-audit
+nuclei-writer
+browser-agent       (Burp MCP)
+browser-stealth-agent (Camoufox)
+```
 
-| Skill | Lines | Pairs With | Highlights |
-|-------|-------|------------|------------|
-| `skills/hunt-rce/SKILL.md` | 1,135 | rce-hunter | 1,218-report distillation. RSC CVE-2025-55182, runc Leaky Vessels, BentoML pickle, LangChain REPL, Tekton/OpenProject git arg injection, ingress-nginx, container/runtime, ML serving, agentic LLM tool-use, OSS supply chain |
-| `skills/hunt-idor/SKILL.md` | 969 | idor-hunter | 1,117-report distillation. Sam Curry automotive chain, OneUptime CVE-2026-30956, Zitadel V2Beta/Mgmt API, Inforcer tenant enum, Apache Answer UUIDv1 prediction, Indico BOLA, GraphQL field-level pivots, agentic AI cross-tenant |
-| `skills/hunt-xss/SKILL.md` | 968 | xss-hunter | DOMPurify mXSS family, Auth0 nextjs-auth0 returnTo, RSC DoS family, markdown-to-jsx, listmonk admin-ATO, Trix rich-text editor (H1 #2819573 / #2521419), Jupyter notebook XSS (GHSA-rch3-82jr-f9w9), n8n MCP OAuth XSS (GHSA-537j-gqpc-p7fq), LinkedIn-class iframe-in-article (H1 #2212950), 10 sub-techniques (A-J), Semgrep / ast-grep / ripgrep / CodeQL patterns |
-| `skills/hunt-oauth/SKILL.md` | 770 | oauth-hunter | 365-report distillation. ruby-saml parser differentials, Authentik regex `redirect_uri`, workers-oauth-provider PKCE downgrade, Entra ID actor token, Hono JWT alg confusion, nOAuth, Tekton token exfil, Argo CD project token, tinyauth |
-| `skills/hunt-llm-ai/SKILL.md` | 930 | llm-ai-hunter | OWASP LLM Top 10 v2025 + Agentic AI Top 10. Microsoft 365 Copilot ASCII Smuggling, LangChain GmailToolkit indirect injection (CVE-2025-46059), LangChain PythonREPLTool semantic RCE (CVE-2025-68613), BentoML pickle, Ollama RCE family, Open WebUI SSE injection, MLflow path traversal |
+### Meta / Validation — 9
 
-Reference skills (read by methodology-aware agents): `hunting-methodology`,
-`recon-methodology`, `report-writing`, `sast-methodology`,
-`triage-validation`, `vuln-classes`.
+```text
+brain
+correlator
+quality-check
+monitor
+poc-builder
+report-writer
+scope-check
+browser-verifier       (client-side PoC proof)
+dast-devils-advocate   (adversarial downgrade)
+```
 
-## CLI Tools (19)
+### SAST Pipeline — 8
+
+```text
+sast-file-ranker
+sast-entry-mapper
+sast-danger-mapper
+sast-flow-tracer
+sast-gap-analyzer
+sast-devils-advocate
+sast-hunter
+sast-exploit-builder
+```
+
+### Specialized — 1
+
+**web3-auditor**
+
+- Solidity grep arsenal
+- Foundry PoC
+- DeFi patterns
+
+---
+
+## 🧪 Hunting Skills
+
+**5 deep methodology skills + 6 reference skills = 11 skills**
+
+The `hunt-*` skills are vulnerability-class-specific methodology files distilled from public bug-bounty reports.
+
+Each includes a verified **2024–2026 CVE catalog** and sub-techniques.
+
+The matching specialist agent reads:
+
+```text
+Read $CLAUDE_PROJECT_DIR/skills/hunt-<class>/SKILL.md
+```
+
+before testing.
+
+| Skill | Lines | Paired agent | Highlights |
+|---|---:|---|---|
+| `skills/hunt-rce/SKILL.md` | 1,135 | `rce-hunter` | 1,218-report distillation; RSC CVE-2025-55182, runc Leaky Vessels, BentoML pickle, LangChain REPL, Tekton/OpenProject git arg injection, ingress-nginx, container/runtime, ML serving, agentic LLM tool-use, OSS supply chain |
+| `skills/hunt-idor/SKILL.md` | 969 | `idor-hunter` | 1,117-report distillation; Sam Curry automotive chain, OneUptime CVE-2026-30956, Zitadel V2Beta/Mgmt API, Inforcer tenant enum, Apache Answer UUIDv1 prediction, Indico BOLA, GraphQL field-level pivots, agentic AI cross-tenant |
+| `skills/hunt-xss/SKILL.md` | 968 | `xss-hunter` | DOMPurify mXSS family, Auth0 nextjs-auth0 returnTo, RSC DoS family, markdown-to-jsx, listmonk admin-ATO, Trix rich-text editor (H1 #2819573 / #2521419), Jupyter notebook XSS (GHSA-rch3-82jr-f9w9), n8n MCP OAuth XSS (GHSA-537j-gqpc-p7fq), LinkedIn-class iframe-in-article (H1 #2212950), 10 sub-techniques (A–J), Semgrep / ast-grep / ripgrep / CodeQL patterns |
+| `skills/hunt-oauth/SKILL.md` | 770 | `oauth-hunter` | 365-report distillation; ruby-saml parser differentials, Authentik regex `redirect_uri`, workers-oauth-provider PKCE downgrade, Entra ID actor token, Hono JWT alg confusion, nOAuth, Tekton token exfil, Argo CD project token, tinyauth |
+| `skills/hunt-llm-ai/SKILL.md` | 930 | `llm-ai-hunter` | OWASP LLM Top 10 v2025 + Agentic AI Top 10; Microsoft 365 Copilot ASCII Smuggling, LangChain GmailToolkit indirect injection (CVE-2025-46059), LangChain PythonREPLTool semantic RCE (CVE-2025-68613), BentoML pickle, Ollama RCE family, Open WebUI SSE injection, MLflow path traversal |
+
+### Reference skills
+
+```text
+hunting-methodology
+recon-methodology
+report-writing
+sast-methodology
+triage-validation
+vuln-classes
+```
+
+---
+
+## 🧰 CLI Tools
+
+**19 tools** form the local security and orchestration layer.
 
 | Tool | Purpose |
-|------|---------|
-| brain.py | Brain with endpoint tracking + circuit breaker |
-| intel_engine.py | Hacktivity patterns + tech→vuln mapping |
-| journal.py | JSONL session journal for /resume |
-| target_selector.py | Program ROI ranking |
-| cost_hook.py | CC hook: auto-logs agent completions via SubagentStop |
-| statusline.py | Dashboard (--compact/--watch/--json) |
-| scope_check.py | Scope validation with --list |
-| scope_hook.py | PreToolUse hook: blocks out-of-scope Bash commands (exact + wildcard) |
-| cvss_version_guard.py | Enforces H1 = CVSS 3.1, other platforms = CVSS 4.0 |
-| file_path_guard.py | Blocks hallucinated file paths in reports |
-| file_safety.py | Shared safety checks for agent-written files |
-| dedup_findings.py | Dedup + hacktivity cross-reference |
-| global_brain.py | Cross-engagement knowledge (incremental hash-based sync) |
-| response_tracker.py | Response learning + auto-boost paid techniques |
-| scaffold.py | Workspace scaffolding with update mode |
-| capture.py | Screenshots + video (WSL2) |
-| cost.py | Token cost tracking + ROI |
-| camofox_ctl.sh | Camoufox (stealth Firefox) lifecycle — Cloudflare/Akamai bypass |
-| pentest-statusline.sh | CC statusline: findings, brain, context, cost |
+|---|---|
+| `brain.py` | Brain with endpoint tracking + circuit breaker |
+| `intel_engine.py` | Hacktivity patterns + technology→vulnerability mapping |
+| `journal.py` | JSONL session journal for `/resume` |
+| `target_selector.py` | Program ROI ranking |
+| `cost_hook.py` | CC hook: auto-logs agent completions via `SubagentStop` |
+| `statusline.py` | Dashboard with `--compact` / `--watch` / `--json` |
+| `scope_check.py` | Scope validation with `--list` |
+| `scope_hook.py` | PreToolUse hook that blocks out-of-scope Bash commands using exact + wildcard matching |
+| `cvss_version_guard.py` | Enforces H1 = CVSS 3.1; other platforms = CVSS 4.0 |
+| `file_path_guard.py` | Blocks hallucinated file paths in reports |
+| `file_safety.py` | Shared safety checks for agent-written files |
+| `dedup_findings.py` | Deduplication + Hacktivity cross-reference |
+| `global_brain.py` | Cross-engagement knowledge with incremental hash-based sync |
+| `response_tracker.py` | Response learning + automatic paid-technique boosting |
+| `scaffold.py` | Workspace scaffolding with update mode |
+| `capture.py` | Screenshots + video (WSL2) |
+| `cost.py` | Token cost tracking + ROI |
+| `camofox_ctl.sh` | Camoufox / stealth Firefox lifecycle — Cloudflare/Akamai bypass |
+| `pentest-statusline.sh` | Claude Code statusline: findings, brain, context, cost |
 
-## Rules Library (`rules/`)
+---
 
-Single source of truth for every agent — all hunters, validators, and report-writers
-read the relevant files at session start.
+## 📚 Rules Library
+
+`rules/` is the **single source of truth** for agents. Hunters, validators, and report-writers read relevant rule files at session start.
 
 | File | Lines | Purpose |
-|------|-------|---------|
-| `hunting.md` | 360 | 31 hunting rules (Rule 0 harm check, Rule 8 sibling check, Rule 9 A→B signal, Rule 19 never-submit, Rule 24 mutation matrix, Rule 28 detection-token rotation, Rule 30 no cross-region inference, Rule 31 unauth state-change battery) |
-| `payloads.md` | 2,605 | XSS (incl. Detection Mechanism Rotation Ladder) / SSRF / SQLi / IDOR / OAuth / upload / race / SSTI / deser / JWT / LFI / prototype pollution / NoSQLi / DeFi |
+|---|---:|---|
+| `hunting.md` | 360 | 31 hunting rules: Rule 0 harm check, Rule 8 sibling check, Rule 9 A→B signal, Rule 19 never-submit, Rule 24 mutation matrix, Rule 28 detection-token rotation, Rule 30 no cross-region inference, Rule 31 unauth state-change battery |
+| `payloads.md` | 2,605 | XSS incl. Detection Mechanism Rotation Ladder, SSRF, SQLi, IDOR, OAuth, upload, race, SSTI, deserialization, JWT, LFI, prototype pollution, NoSQLi, DeFi |
 | `techniques.md` | 389 | Proven attack techniques extracted from real paid engagements |
-| `waf-bypass-protocol.md` | 166 | WAF bypass iteration ladder for Akamai/Cloudflare/Imperva |
+| `waf-bypass-protocol.md` | 166 | WAF bypass iteration ladder for Akamai / Cloudflare / Imperva |
 | `vendor-status.md` | 127 | Patched vendor vectors, framework fingerprints, cooldown tables |
-| `chain-table.md` | 192 | Capability→next-bug chain table for `/chain` (9 capability rows + 4 documented deep chains) |
+| `chain-table.md` | 192 | Capability→next-bug chain table for `/chain`: 9 capability rows + 4 documented deep chains |
 | `never-submit.md` | 42 | Never-submit list + conditionally-valid-with-chain table |
 | `mistakes.md` | 665 | Top 10 most common mistakes — every agent reads this at session start |
 
-## Key Features
+---
 
-- **Writeup search MCP**: Agents query prior art during hunting — bring your own FAISS/SQLite writeup index, or fall back to the shipped payload/technique library
-- **CC hooks**: SubagentStop/Stop auto-log costs, statusline shows live `$X.XX` from token data
-- **PreToolUse scope hook**: Bash commands are matched (exact + wildcard) against `scope.yaml`; out-of-scope targets are blocked before the tool call fires
-- **7-Question Gate**: Every finding validated — first NO = KILL
-- **Depth Engine**: `/autopilot` enforces an anti-shallow protocol — no claim of "exhausted" until the exhaustion matrix is complete
-- **Stacked-encoding mandate**: `/hunt` and `/autopilot` require multi-layer encoding in every payload attempt before declaring a surface clean
-- **CVSS policy guard**: HackerOne findings use CVSS 3.1; every other platform uses CVSS 4.0 — enforced by `cvss_version_guard.py`
-- **Circuit breaker**: 5× consecutive 403/429 → auto-backoff 60s
-- **Endpoint tracking**: Brain records every endpoint tested per target
-- **Hard validation gates**: /report and /submit refuse without /validate PASS
-- **Never-submit filter**: Pipeline auto-kills informational findings
-- **Incremental sync**: Global brain hash-based, skips unchanged files
-- **Feedback loop**: /learn auto-boosts paid techniques globally
-- **Session journal**: JSONL log for /resume continuity
+## 🛡️ Security & Orchestration Highlights
 
-## Requirements
+| Capability | What it enforces |
+|---|---|
+| **Writeup Search MCP** | Prior-art lookup using your FAISS/SQLite index, with shipped payload/technique fallback |
+| **CC Hooks** | `SubagentStop` / `Stop` cost logging + live statusline |
+| **PreToolUse Scope Hook** | Exact + wildcard matching against `scope.yaml`; blocks out-of-scope Bash before execution |
+| **7-Question Gate** | Every finding is validated; first `NO` = `KILL` |
+| **Depth Engine** | `/autopilot` prevents shallow "exhausted" claims until the exhaustion matrix is complete |
+| **Stacked-Encoding Mandate** | `/hunt` and `/autopilot` require multi-layer encoding in every payload attempt before declaring a surface clean |
+| **CVSS Policy Guard** | HackerOne → CVSS 3.1; every other platform → CVSS 4.0 |
+| **Circuit Breaker** | 5× consecutive 403/429 → automatic 60-second backoff |
+| **Endpoint Tracking** | Brain records every tested endpoint per target |
+| **Hard Validation Gates** | `/report` and `/submit` refuse without `/validate PASS` |
+| **Never-Submit Filter** | Informational findings are automatically killed |
+| **Incremental Sync** | Global brain uses hashes and skips unchanged files |
+| **Feedback Loop** | `/learn` automatically boosts paid techniques globally |
+| **Session Journal** | JSONL logging preserves `/resume` continuity |
 
-- Python 3.10+, `uv` (MCP servers launch via `uv run --with mcp`)
-- Optional: `uv pip install faiss-cpu sentence-transformers` (for writeup semantic search)
-- Security tools: nmap, httpx, subfinder, nuclei, ffuf, katana, sqlmap
-- GraphQL hunter tools: `graphql-path-enum` — `cargo install --git https://gitlab.com/dee-see/graphql-path-enum` (auto-installed by `setup-mcp.sh` if `cargo` is present)
-- Evidence: grim/scrot, wf-recorder/ffmpeg
-- jq (for statusline)
+---
 
-## License
+## 📊 Project at a glance
+
+```text
+~760 files
+~118k lines
+50 agents
+26 commands
+19 CLI tools
+11 skills
+2 MCP servers
+16 bug-bounty platforms
+7 AI coding tools
+2,500 payload lines
+```
+
+### The architecture in one sentence
+
+> **AI reasoning → centralized policy → controlled tools → evidence → validation → report → human approval.**
+
+---
+
+## ⚙️ Requirements
+
+### Core
+
+- Python 3.10+
+- `uv` — MCP servers launch via `uv run --with mcp`
+
+### Optional semantic search
+
+```bash
+uv pip install faiss-cpu sentence-transformers
+```
+
+### Security tooling
+
+```text
+nmap
+httpx
+subfinder
+nuclei
+ffuf
+katana
+sqlmap
+```
+
+### GraphQL
+
+```text
+graphql-path-enum
+```
+
+Install:
+
+```bash
+cargo install --git https://gitlab.com/dee-see/graphql-path-enum
+```
+
+`setup-mcp.sh` auto-installs it when `cargo` is available.
+
+### Evidence
+
+```text
+grim / scrot
+wf-recorder / ffmpeg
+```
+
+### Statusline
+
+```text
+jq
+```
+
+---
+
+## 🔐 Authorization
+
+Cyvantas is designed for **authorized security testing only**.
+
+Use it only against assets and programs for which you have explicit permission, follow the applicable program rules, and practice responsible disclosure.
+
+---
+
+## 📄 License
 
 For authorized security testing only. Follow responsible disclosure.
