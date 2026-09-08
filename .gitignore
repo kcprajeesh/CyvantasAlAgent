@@ -1,0 +1,51 @@
+# Scan output (may contain sensitive target data)
+recon/
+findings/
+sast-work/
+scans/
+js-analysis/
+poc/
+evidence/
+
+# Findings database (contains vulnerability details)
+findings.json
+findings.csv
+
+# Environment and credentials
+.env
+*.key
+*.pem
+tokens.txt
+
+# Tool caches
+.nuclei/
+.httpx/
+__pycache__/
+*.pyc
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Reports (commit only sanitized versions)
+reports/drafts/
+
+# Scope file with active targets (use .example versions for git)
+# Uncomment if your scope contains sensitive internal targets:
+# .scope.txt
+# scope.yaml
+cost-tracking.json
+
+# Local agent memory (target-specific notes, sessions, techniques)
+.claude/agent-memory-local/
+
+# Screenshots accidentally saved into the repo root
+# (Android/iOS default filename: YYYYMMDD_HHMMSS.jpg/png)
+[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]_[0-9][0-9][0-9][0-9][0-9][0-9].jpg
+[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]_[0-9][0-9][0-9][0-9][0-9][0-9].png
+Screenshot*.png
+
+# Local-only files not meant for the repo
+uv.lock
+docs/superpowers/plans/
+docs/superpowers/specs/
